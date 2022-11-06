@@ -16,7 +16,7 @@ public class ContentProducer extends Producer {
         this.podcasts = new ArrayList<Podcast>();
     }
     
-    public void addSong(Audio audio) {
+    public void addPodcast(Audio audio) {
         Podcast podcast = (Podcast) audio;
         podcasts.add(podcast);
     }

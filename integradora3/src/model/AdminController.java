@@ -110,7 +110,7 @@ public class AdminController {
                 if (users.get(i).getNickname().equalsIgnoreCase(contentProducer)) {
                     ContentProducer user = (ContentProducer) users.get(i);
                     if (user.searchPodcast(name) == null) {
-                        user.addSong(podcast);
+                        user.addPodcast(podcast);
                         users.remove(users.get(i));
                         users.add(user);
                         found = true;
@@ -182,7 +182,7 @@ public class AdminController {
         Producer producer = null;
         Song song = null;
         Podcast podcast = null;
-        Playlist playlist = null;
+        //Playlist playlist = null;
         String msj = "Changes realized succesfully.";
         if (searchUser(consumerName) != null && searchUser(consumerName) instanceof Consumer && searchUser(producerName) != null && searchUser(producerName) instanceof Producer) {
             if (searchUser(consumerName) instanceof Standard) {
@@ -261,11 +261,11 @@ public class AdminController {
                     }
                     break;
                 case 2:
-                    //Iniciar búsqueda de la canción
+                    //Iniciar búsqueda del podcast
                     if (producer instanceof ContentProducer) {
                         ContentProducer producerObj = (ContentProducer) producer;
                         if (producerObj.searchPodcast(audioName) != null) {
-                            //podcast = canción encontrada
+                            //podcast = podcast encontrado
                             podcast = producerObj.searchPodcast(audioName);
                             //Iniciar búsqueda de la playlist del usuario
                             if (consumer instanceof Standard) {
