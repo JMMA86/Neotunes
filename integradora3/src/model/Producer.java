@@ -18,4 +18,5 @@ public class Producer extends User {
         this.name = name;
         this.urlImage = urlImage;
     }
+    
 }

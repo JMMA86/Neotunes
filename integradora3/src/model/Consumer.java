@@ -18,13 +18,9 @@ public class Consumer extends User {
     //relations
     private ArrayList<String> listenedSongs;
     private ArrayList<Integer> numListSongs;
-    private ArrayList<Shop> songs;
-    private ArrayList<Playlist> playlists;
 
     //methods
     public Consumer(String nickname, String id, LocalDate date) {
         super(nickname, id, date);
-        this.songs = new ArrayList<Shop>();
-        this.playlists = new ArrayList<Playlist>();
     }
 }

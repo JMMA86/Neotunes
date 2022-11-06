@@ -2,8 +2,6 @@ package ui;
 import model.*;
 import java.util.Scanner;
 
-import javax.sound.midi.Soundbank;
-
 public class NeotunesApp {
     private static Scanner input;
     private AdminController controller;
@@ -28,7 +26,13 @@ public class NeotunesApp {
                     break;
                 case 2:
                     objMain.registerAudio();
-                    break; 
+                    break;
+                case 3:
+                    objMain.registerPlaylist();
+                    break;
+                case 4:
+                    objMain.editPlaylist();
+                    break;
                 case 0:
                     System.out.println("\nExit done.");
                     break;
@@ -43,6 +47,8 @@ public class NeotunesApp {
         System.out.print("\n-Menu-" +
         "\n1. Register user" +
         "\n2. Register audio" +
+        "\n3. Register playlist" +
+        "\n4. Edit playlist" +
         "\n0. Exit" +
         "\nOption: ");
     }
@@ -142,7 +148,35 @@ public class NeotunesApp {
             default:
                 System.out.print("Error. Invalid type.");
                 break;
-        }
-        
+        }  
+    }
+
+    public void registerPlaylist() {
+        System.out.print("\n-Playlist registration-\nEnter name (playlist): ");
+        String name = input.nextLine();
+        System.out.print("Enter user (nickname): ");
+        String user = input.nextLine();
+        System.out.println(controller.addPlaylist(name, user));
+    }
+    
+    public void editPlaylist() {
+        System.out.print("\n-Playlist edition-" +
+        "\nEnter name (playlist): ");
+        String playlist = input.nextLine();
+        System.out.print("\nSelect an option:" +
+        "\n1. Add song" +
+        "\n2. Delete song" +
+        "\n3. Add podcast" +
+        "\n4. Delete podcast" +
+        "\nOption: ");
+        int option = input.nextInt();
+        input.nextLine();
+        System.out.print("\nEnter audio (name): ");
+        String audio = input.nextLine();
+        System.out.print("Enter author (producer nickname): ");
+        String producer = input.nextLine();
+        System.out.print("Enter consumer (nickname): ");
+        String consumer = input.nextLine();
+        System.out.println(controller.editPlaylist(playlist, audio, consumer, producer, option));
     }
 }
