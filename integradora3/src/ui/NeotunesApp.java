@@ -2,15 +2,39 @@ package ui;
 import model.*;
 import java.util.Scanner;
 
-public class NeotunesApp {
-    private static Scanner input;
-    private AdminController controller;
+/**
+Program objective: Create a music streaming software that allows users to register consumers and producers,
+audios and playlists; in addition to purchases, simulation of reproductions and display statistics.
+@author Juan Manuel Marín Angarita
+*/
 
+/**
+ * <b>Class: </b> NeotunesApp (main) <br>
+ */
+public class NeotunesApp {
+    /**
+     * <b>input: </b> Scanner variable to get user input.
+     */
+    private static Scanner input;
+    /**
+     * <b>controller: </b> Relation with the controller of the program.
+     */
+    private AdminController controller;
+    
+    /**
+     * <b>name: </b> NeotunesApp <br>
+     * This is the constructor of the class "NeotunesAPp" (main). <br>
+     */
     public NeotunesApp() {
         input = new Scanner(System.in);
         controller = new AdminController();
     }
 
+    /**
+     * <b>name: </b> main <br>
+     * Executes the program <br>
+     * @param args - Main.
+     */
     public static void main(String args[]) {
         NeotunesApp objMain = new NeotunesApp();
         System.out.println("Welcome to Neotunes!");
@@ -42,7 +66,11 @@ public class NeotunesApp {
             }
         } while (option != 0);
     }
-
+    
+    /**
+     * <b>name: </b> displayMenu <br>
+     * Shows the available options to execute in the program. <br>
+     */
     public void displayMenu() {
         System.out.print("\n-Menu-" +
         "\n1. Register user" +
@@ -53,6 +81,10 @@ public class NeotunesApp {
         "\nOption: ");
     }
 
+    /**
+     * <b>name: </b> registerUser <br>
+     * This function registers an user (consumers and producers) to the system. <br>
+     */
     public void registerUser() {
         System.out.print("\n-User registration-" +
         "\nEnter nickname: ");
@@ -95,6 +127,10 @@ public class NeotunesApp {
         }
     }
 
+    /**
+     * <b>name: </b> registerAudio <br>
+     * This function registers an audio (song or podcast) of a producer in the system. <br>
+     */
     public void registerAudio() {
         System.out.print("\n-Audio registration-" +
         "\nEnter name: ");
@@ -151,6 +187,10 @@ public class NeotunesApp {
         }  
     }
 
+    /**
+     * <b>name: </b> registerPlayist <br>
+     * This function registers a playlist for a consumer. <br>
+     */
     public void registerPlaylist() {
         System.out.print("\n-Playlist registration-\nEnter name (playlist): ");
         String name = input.nextLine();
@@ -159,6 +199,10 @@ public class NeotunesApp {
         System.out.println(controller.addPlaylist(name, user));
     }
     
+    /**
+     * <b>name: </b> editPlaylist <br>
+     * This function modifies a playlist of a consumer with options as adding and deleting audio. <br>
+     */
     public void editPlaylist() {
         System.out.print("\n-Playlist edition-" +
         "\nEnter name (playlist): ");

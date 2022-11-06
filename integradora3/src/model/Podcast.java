@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * <b>Class: </b> Podcast <br>
+ */
 public class Podcast extends Audio implements Playable{
     //constants
 
@@ -10,6 +13,15 @@ public class Podcast extends Audio implements Playable{
     private Category category;
     
     //methods
+    /**
+     * <b>name: </b> Level <br>
+     * This is the constructor of the class "Podcast". <br>
+     * @param name Name of the podcast.
+     * @param urlImage URL icon.
+     * @param timeRep Length in seconds of the podcast.
+     * @param description Description of the podcast.
+     * @param category Category of the podcast (1: Politics, 2: Entertainment, 3: Video Games, 4: Fashion).
+     */
     public Podcast(String name, String urlImage, int timeRep, String description, int category) {
         super(name, urlImage, timeRep);
         this.description = description;

@@ -2,6 +2,9 @@ package model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+/**
+ * <b>Class: </b> AdminController <br>
+ */
 public class AdminController {
     //constants
 
@@ -11,10 +14,22 @@ public class AdminController {
     private ArrayList<User> users;
     
     //methods
+    /**
+     * <b>name: </b> AdminController <br>
+     * This is the constructor of the class "AdminController".
+     */
     public AdminController() {
         this.users = new ArrayList<User>();
     }
 
+    /**
+     * <b>name: </b> searchUser <br>
+     * Checks if an user is registered under a given nickname. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the object of the user if found.
+     * @param nickname Nickname of the user to look for.
+     * @return <b>user</b> User if it's found.
+     */
     public User searchUser(String nickname) {
         boolean found = false;
         User user = null;
@@ -27,6 +42,16 @@ public class AdminController {
         return user;
     }
 
+    /**
+     * <b>name: </b> addUser <br>
+     * Adds a consumer user to the system. <br>
+     * <b>pre: </b> The user's nickname is not registered currently. <br>
+     * <b>post: </b> The system adds the new user.
+     * @param type Defines if the consumer is type Standard or Premium.
+     * @param nickname Nickname of the user to register.
+     * @param id Id of the user to register.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
     public String addUser(int type, String nickname, String id) {
         String msj = "Added succesfully.";
         LocalDate date = LocalDate.now();
@@ -51,6 +76,18 @@ public class AdminController {
         return msj;
     }
 
+    /**
+     * <b>name: </b> addUser <br>
+     * Adds a producer user to the system. <br>
+     * <b>pre: </b> The user's nickname is not registered currently. <br>
+     * <b>post: </b> The system adds the new user.
+     * @param type Defines if the producer is an Artist or a Content Creator.
+     * @param name Name of the user to register.
+     * @param nickname Nickname of the user to register.
+     * @param urlImage URL of the user's icon.
+     * @param id Id of the user to register.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
     public String addUser(int type, String name, String nickname, String urlImage, String id) {
         String msj = "Added succesfully.";
         LocalDate date = LocalDate.now();
@@ -75,6 +112,20 @@ public class AdminController {
         return msj;
     }
 
+    /**
+     * <b>name: </b> addAudio <br>
+     * Adds a song to the system. <br>
+     * <b>pre: </b> The artist who is adding the song doesn't have other with the same name. <br>
+     * <b>post: </b> The system adds the new song.
+     * @param name Name of the song.
+     * @param urlImage Url icon of the song.
+     * @param album Album of the song.
+     * @param price Price of the song.
+     * @param genre Genre of the song (1: Rock, 2: Pop, 3: Trap, 4: House).
+     * @param artist Artist who is adding the song.
+     * @param timeRep Duration in seconds of the song.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
     public String addAudio(String name, String urlImage, String album, double price, int genre, String artist, int timeRep) {
         String msj = "Added correctly.";
         boolean found = false;
@@ -99,6 +150,19 @@ public class AdminController {
         return msj;
     }
 
+    /**
+     * <b>name: </b> addAudio <br>
+     * Adds a podcast to the system. <br>
+     * <b>pre: </b> The creator content who is adding the podcast doesn't have other with the same name. <br>
+     * <b>post: </b> The system adds the new podcast.
+     * @param name Name of the podcast.
+     * @param urlImage Url icon of the podcast.
+     * @param description Description of what is the podcast about.
+     * @param category Category of the podcast (1: Politics, 2: Entertainment, 3: Video Games, 4: Fashion).
+     * @param contentProducer Content producer who is adding the podcast.
+     * @param timeRep Duration in seconds of the podcast.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
     public String addAudio(String name, String urlImage, String description, int category, String contentProducer, int timeRep) {
         String msj = "Added correctly.";
         boolean found = false;
@@ -123,6 +187,15 @@ public class AdminController {
         return msj;
     }
 
+    /**
+     * <b>name: </b> addPlaylist <br>
+     * Adds a playlist to the system. <br>
+     * <b>pre: </b> The user who is adding the playlist is a consumer and doesn't have other playlist with the same name. <br>
+     * <b>post: </b> The system adds the new playlist to the user.
+     * @param name Name of the new playlist.
+     * @param user Name of the consumer who is adding the playlist.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
     public String addPlaylist(String name, String user) {
         String msj = "Added correctly.";
         boolean found = false;
@@ -161,6 +234,18 @@ public class AdminController {
         return msj;
     }
     
+    /**
+     * <b>name: </b> editPlaylist <br>
+     * Modifies a playlist of a consumer. <br>
+     * <b>pre: </b> The user exists and is a consumer; this user's playlist exists; if the consumer is standard, he will not be able to add more than 20 audios; the audio exists. <br>
+     * <b>post: </b> The system amodifies a playlist depending of the users request.
+     * @param playlistName Playlist to be modified.
+     * @param audioName Audio to be added or deleted.
+     * @param consumerName User who is modifying its playlist.
+     * @param producerName Producer of the audio.
+     * @param option Request of the user.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
     public String editPlaylist(String playlistName, String audioName, String consumerName, String producerName, int option) {
         /* Option:
         "1. Add song" +
@@ -168,9 +253,9 @@ public class AdminController {
         "3. Add podcast" +
         "4. Delete podcast" +
 
-        1. Verificar que el consumidor y el productor existen
-        2. Verificar que la canción existe
-        3. Ejecutar opción
+        1. Verify that the consumer and producer exist
+        2. Verify that the song exists
+        3. Execute option
          */
         int changes = 0;
         if (option == 1 || option == 2) {
@@ -201,17 +286,18 @@ public class AdminController {
             }
             switch (changes) {
                 case 1:
-                    //Iniciar búsqueda de la canción
+                    //Start song search
                     if (producer instanceof Artist) {
                         Artist producerObj = (Artist) producer;
                         if (producerObj.searchSong(audioName) != null) {
-                            //song = canción encontrada
+                            //song = found song
                             song = producerObj.searchSong(audioName);
-                            //Iniciar búsqueda de la playlist del usuario
+                            //Start user playlist search
                             if (consumer instanceof Standard) {
                                 Standard consumerObj = (Standard) consumer;
                                 if (consumerObj.searchPlaylist(playlistName) != null) {
                                     Playlist editablePlaylist = consumerObj.searchPlaylist(playlistName);
+                                    //Edit playlist
                                     if (option == 1) {
                                         if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
                                             editablePlaylist.addAudio(song);
@@ -261,17 +347,18 @@ public class AdminController {
                     }
                     break;
                 case 2:
-                    //Iniciar búsqueda del podcast
+                    //Start podcast search
                     if (producer instanceof ContentProducer) {
                         ContentProducer producerObj = (ContentProducer) producer;
                         if (producerObj.searchPodcast(audioName) != null) {
-                            //podcast = podcast encontrado
+                            //podcast = found podcast
                             podcast = producerObj.searchPodcast(audioName);
-                            //Iniciar búsqueda de la playlist del usuario
+                            //Start user playlist search
                             if (consumer instanceof Standard) {
                                 Standard consumerObj = (Standard) consumer;
                                 if (consumerObj.searchPlaylist(playlistName) != null) {
                                     Playlist editablePlaylist = consumerObj.searchPlaylist(playlistName);
+                                    //Edit playlist
                                     if (option == 3) {
                                         if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
                                             editablePlaylist.addAudio(podcast);

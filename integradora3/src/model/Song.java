@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * <b>Class: </b> Song <br>
+ */
 public class Song extends Audio implements Playable, Salable {
     //constants
 
@@ -12,6 +15,16 @@ public class Song extends Audio implements Playable, Salable {
     private Genre genre;
 
     //methods
+    /**
+     * <b>name: </b> Song <br>
+     * This is the constructor of the class "Song". <br>
+     * @param name Name of the song.
+     * @param urlImage URL icon.
+     * @param timeRep Length in seconds of the song.
+     * @param album Album of the song.
+     * @param price Price of the song.
+     * @param genre Genre of the song (1: Rock, 2: Pop, 3: Trap, 4: House).
+     */
     public Song(String name, String urlImage, int timeRep, String album, double price, int genre) {
         super(name, urlImage, timeRep);
         this.album = album;
