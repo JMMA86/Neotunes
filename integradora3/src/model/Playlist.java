@@ -1,5 +1,6 @@
 package model;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * <b>Class: </b> Playlist <br>
@@ -122,5 +123,128 @@ public class Playlist {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * <b>name: </b> sharePlaylist <br>
+     * Generates an id for a playlist. <br>
+     * <b>pre: </b> The playlist must contain at least one audio. <br>
+     * <b>post: </b> Returns the id.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String sharePlaylist() {
+        String msj = null;
+        boolean songs = false;
+        boolean podcasts = false;
+        String id = "";
+        int counter;
+        //Matrix creation
+        int[][] matrix = new int[6][6];
+        Random rand = new Random();
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                matrix[i][j] = rand.nextInt(9);
+            }
+        }
+        //Playlist content identification
+        for (int i = 0; i < audios.size(); i++) {
+            if (audios.get(i) instanceof Song) {
+                songs = true;
+            } else if (audios.get(i) instanceof Podcast) {
+                podcasts = true;
+            }
+        }
+        //Id creation
+        if (songs && !podcasts) {
+            //Matrix "N"
+            counter = 5;
+            while (counter != 0) {
+                id += matrix[counter][0];
+                counter--;
+            }
+            while (counter != 5) {
+                id += matrix[counter][counter];
+                counter++;
+            }
+            while (counter != -1) {
+                id += matrix[counter][5];
+                counter--;
+            }
+        } else if (!songs && podcasts) {
+            //Matrix "T"
+            counter = 0;
+            while (counter != 2) {
+                id += matrix[0][counter];
+                counter++;
+            }
+            counter = 0;
+            while (counter != 6) {
+                id += matrix[counter][2];
+                counter++;
+            }
+            counter--;
+            while (counter != 0) {
+                id += matrix[counter][3];
+                counter--;
+            }
+            counter = 3;
+            while (counter != 6) {
+                id += matrix[0][counter];
+                counter++;
+            }
+        } else if (songs && podcasts) {
+            //Matrix "Interleaved"
+            counter = 2;
+            for (int i = matrix.length - 1; i >= 0; i--) {
+                if (i > 1) {
+                    if (counter == 1) {
+                        id += matrix[i][5];
+                        id += matrix[i][3];
+                        id += matrix[i][1];
+                        counter = 2;
+                    } else {
+                        id += matrix[i][4];
+                        id += matrix[i][2];
+                        id += matrix[i][0];
+                        counter = 1;
+                    }
+                } else {
+                    if (counter == 1) {
+                        id += matrix[i][5];
+                        id += matrix[i][3];
+                        counter = 2;
+                    } else {
+                        id += matrix[i][4];
+                        id += matrix[i][2];
+                        counter = 1;
+                    }
+                }
+            }
+        } else {
+            msj = "Error. No audios found.";
+        }
+        if (!id.equals("")) {
+            msj = "\nId generated: " + id + "\n\nMatrix: " + "\n" + printMatrix(matrix);
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> printMatrix <br>
+     * Convert a matrix into a message that can be displayed on the console. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the msj.
+     * @param matrix Matrix to be converted.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String printMatrix(int[][] matrix) {
+        String msj = "";
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                msj += matrix[i][j] + " ";
+            }
+            msj += "\n";
+        }
+        return msj;
     }
 }

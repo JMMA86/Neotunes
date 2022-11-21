@@ -5,14 +5,14 @@ import java.util.ArrayList;
 /**
  * <b>Class: </b> Artist <br>
  */
-public class Artist extends Producer {    
+public class Artist extends Producer implements Comparable<Artist> {    
     //constants
 
     //attributes
 
     //relations
     private ArrayList<Song> songs;
-    
+
     //methods
     /**
      * <b>name: </b> Artist <br>
@@ -22,9 +22,10 @@ public class Artist extends Producer {
      * @param date Registration date.
      * @param name Name of the artist.
      * @param urlImage URL icon.
+     * @param views Initial views (0).
      */
-    public Artist(String nickname, String id, LocalDate date, String name, String urlImage) {
-        super(nickname, id, date, name, urlImage);
+    public Artist(String nickname, String id, LocalDate date, String name, String urlImage, int views) {
+        super(nickname, id, date, name, urlImage, views);
         this.songs = new ArrayList<Song>();
     }
 
@@ -58,5 +59,55 @@ public class Artist extends Producer {
             }
         }
         return song;
+    }
+
+    /**
+     * <b>name: </b> updateSong <br>
+     * Updates a song's stats as it's played. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Updates song.
+     * @param song involved song.
+     */
+    public void updateSong(Song song) {
+        boolean found = false;
+        for (int i = 0; i < songs.size() && !found; i++) {
+            if (songs.get(i).getName().equalsIgnoreCase(song.getName())) {
+                songs.remove(i);
+                songs.add(song);
+                getTotalRep();
+            }
+        }
+    }
+
+    /**
+     * <b>name: </b> getTotalRep <br>
+     * Returns the views of an artist. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns views.
+     * @return <b>views</b>. Views of the artist.
+     */
+    public int getTotalRep() {
+        int views = super.getTotalRep();
+        for (int i = 0; i < songs.size(); i++) {
+            views += songs.get(i).getViews();
+        }
+        this.views = views;
+        return views;
+    }
+
+    /**
+     * <b>name: </b> getSongs <br>
+     * Returns the list of songs of an artist. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns list.
+     * @return <b>songs</b>. List of songs of the artist.
+     */
+    public ArrayList<Song> getSongs() {
+        return songs;
+    }
+
+    @Override
+    public int compareTo(Artist o) {
+        return views.compareTo(o.getTotalRep());
     }
 }

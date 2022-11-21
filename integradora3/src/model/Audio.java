@@ -10,7 +10,10 @@ public class Audio {
     private String name;
     private String urlImage;
     private int timeRep;
-    private int views;
+    /**
+     * Views of an audio
+     */
+    protected Integer views;
 
     //relations
     
@@ -26,6 +29,7 @@ public class Audio {
         this.name = name;
         this.urlImage = urlImage;
         this.timeRep = timeRep;
+        this.views = 0;
     }
 
     /**

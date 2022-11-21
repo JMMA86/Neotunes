@@ -1,6 +1,7 @@
 package model;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * <b>Class: </b> AdminController <br>
@@ -95,11 +96,11 @@ public class AdminController {
         if (searchUser(nickname) == null) {
             switch (type) {
                 case 1:
-                    user = new Artist(nickname, id, date, name, urlImage);
+                    user = new Artist(nickname, id, date, name, urlImage, 0);
                     users.add(user);
                     break;
                 case 2:
-                    user = new ContentProducer(nickname, id, date, name, urlImage);
+                    user = new ContentProducer(nickname, id, date, name, urlImage, 0);
                     users.add(user);
                     break;
                 default:
@@ -199,36 +200,26 @@ public class AdminController {
     public String addPlaylist(String name, String user) {
         String msj = "Added correctly.";
         boolean found = false;
-        if (searchUser(user) != null) {
-            for (int i = 0; i < users.size() && !found; i++) {
-                if (users.get(i).getNickname().equalsIgnoreCase(user)) {
-                    if (users.get(i) instanceof Producer) {
-                        msj = "Error. This user is a producer.";
+        for (int i = 0; i < users.size() && !found; i++) {
+            if (users.get(i).getNickname().equalsIgnoreCase(user)) {
+                Consumer objConsumer = (Consumer) users.get(i);
+                found = true;
+                if (users.get(i) instanceof Producer) {
+                    msj = "Error. This user is a producer.";
+                } else {
+                    String operationResult = objConsumer.addPlaylist(name);
+                    if (operationResult.equalsIgnoreCase("Repeated.")) {
+                        msj = "Error. This user has a playlist with the same name.";
+                    } else if (operationResult.equalsIgnoreCase("Limit reached.")){
+                        msj = "Error. Limit reached for this user.";
                     } else {
-                        if (users.get(i) instanceof Standard) {
-                            Standard consumer = (Standard) users.get(i);
-                            String operationResult = consumer.addPlaylist(name);
-                            if (operationResult.equalsIgnoreCase("Repeated.")) {
-                                msj = "Error. This user has a playlist with the same name.";
-                            } else if (operationResult.equalsIgnoreCase("Limit reached.")){
-                                msj = "Error. Limit reached for this user.";
-                            } else {
-                                users.remove(i);
-                                users.add(consumer);
-                            }
-                        } else if (users.get(i) instanceof Premium) {
-                            Premium consumer = (Premium) users.get(i);
-                            if (consumer.addPlaylist(name).equalsIgnoreCase("Repeated.")) {
-                                msj = "Error. This user has a playlist with the same name.";
-                            } else {
-                                users.remove(i);
-                                users.add(consumer);
-                            }
-                        }
+                        users.remove(i);
+                        users.add(objConsumer);
                     }
                 }
             }
-        } else {
+        }
+        if (!found) {
             msj = "Error. User does not exist.";
         }
         return msj;
@@ -270,20 +261,8 @@ public class AdminController {
         //Playlist playlist = null;
         String msj = "Changes realized succesfully.";
         if (searchUser(consumerName) != null && searchUser(consumerName) instanceof Consumer && searchUser(producerName) != null && searchUser(producerName) instanceof Producer) {
-            if (searchUser(consumerName) instanceof Standard) {
-                Standard consumerObj = (Standard) searchUser(consumerName);
-                consumer = consumerObj;
-            } else if (searchUser(consumerName) instanceof Premium) {
-                Premium consumerObj = (Premium) searchUser(consumerName);
-                consumer = consumerObj;
-            }
-            if (searchUser(producerName) instanceof Artist) {
-                Artist producerObj = (Artist) searchUser(producerName);
-                producer = producerObj;
-            } else if (searchUser(producerName) instanceof ContentProducer) {
-                ContentProducer producerObj = (ContentProducer) searchUser(producerName);
-                producer = producerObj;
-            }
+            consumer = (Consumer) searchUser(consumerName);
+            producer = (Producer) searchUser(producerName);
             switch (changes) {
                 case 1:
                     //Start song search
@@ -293,51 +272,26 @@ public class AdminController {
                             //song = found song
                             song = producerObj.searchSong(audioName);
                             //Start user playlist search
-                            if (consumer instanceof Standard) {
-                                Standard consumerObj = (Standard) consumer;
-                                if (consumerObj.searchPlaylist(playlistName) != null) {
-                                    Playlist editablePlaylist = consumerObj.searchPlaylist(playlistName);
-                                    //Edit playlist
-                                    if (option == 1) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
-                                            editablePlaylist.addAudio(song);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. This song exists in that playlist.";
-                                        }
-                                    } else if (option == 2) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) != null) {
-                                            editablePlaylist.deleteAudio(song, producerObj);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. Song not found in the playlist.";
-                                        }
+                            if (consumer.searchPlaylist(playlistName) != null) {
+                                Playlist editablePlaylist = consumer.searchPlaylist(playlistName);
+                                //Edit playlist
+                                if (option == 1) {
+                                    if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
+                                        editablePlaylist.addAudio(song);
+                                        consumer.updatePlaylist(editablePlaylist);
+                                    } else {
+                                        msj = "Error. This song exists in that playlist.";
                                     }
-                                } else {
-                                    msj = "Error. Playlist not found.";
-                                }
-                            } else if (consumer instanceof Premium) {
-                                Premium consumerObj = (Premium) consumer;
-                                if (consumerObj.searchPlaylist(playlistName) != null) {
-                                    Playlist editablePlaylist = consumerObj.searchPlaylist(playlistName);
-                                    if (option == 1) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
-                                            editablePlaylist.addAudio(song);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. This song exists in that playlist.";
-                                        }
-                                    } else if (option == 2) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) != null) {
-                                            editablePlaylist.deleteAudio(song, producerObj);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. Song not found in the playlist.";
-                                        }
+                                } else if (option == 2) {
+                                    if (editablePlaylist.searchAudio(audioName, producerObj) != null) {
+                                        editablePlaylist.deleteAudio(song, producerObj);
+                                        consumer.updatePlaylist(editablePlaylist);
+                                    } else {
+                                        msj = "Error. Song not found in the playlist.";
                                     }
-                                } else {
-                                    msj = "Error. Playlist not found.";
                                 }
+                            } else {
+                                msj = "Error. Playlist not found.";
                             }
                         } else {
                             msj = "Error. Song not found.";
@@ -354,51 +308,26 @@ public class AdminController {
                             //podcast = found podcast
                             podcast = producerObj.searchPodcast(audioName);
                             //Start user playlist search
-                            if (consumer instanceof Standard) {
-                                Standard consumerObj = (Standard) consumer;
-                                if (consumerObj.searchPlaylist(playlistName) != null) {
-                                    Playlist editablePlaylist = consumerObj.searchPlaylist(playlistName);
-                                    //Edit playlist
-                                    if (option == 3) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
-                                            editablePlaylist.addAudio(podcast);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. This podcast exists in that playlist.";
-                                        }
-                                    } else if (option == 4) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) != null) {
-                                            editablePlaylist.deleteAudio(podcast, producerObj);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. Podcast not found in the playlist.";
-                                        }
+                            if (consumer.searchPlaylist(playlistName) != null) {
+                                Playlist editablePlaylist = consumer.searchPlaylist(playlistName);
+                                //Edit playlist
+                                if (option == 3) {
+                                    if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
+                                        editablePlaylist.addAudio(podcast);
+                                        consumer.updatePlaylist(editablePlaylist);
+                                    } else {
+                                        msj = "Error. This podcast exists in that playlist.";
                                     }
-                                } else {
-                                    msj = "Error. Playlist not found.";
-                                }
-                            } else if (consumer instanceof Premium) {
-                                Premium consumerObj = (Premium) consumer;
-                                if (consumerObj.searchPlaylist(playlistName) != null) {
-                                    Playlist editablePlaylist = consumerObj.searchPlaylist(playlistName);
-                                    if (option == 3) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) == null) {
-                                            editablePlaylist.addAudio(podcast);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. This podcast exists in that playlist.";
-                                        }
-                                    } else if (option == 4) {
-                                        if (editablePlaylist.searchAudio(audioName, producerObj) != null) {
-                                            editablePlaylist.deleteAudio(podcast, producerObj);
-                                            consumerObj.updatePlaylist(editablePlaylist);
-                                        } else {
-                                            msj = "Error. Podcast not found in the playlist.";
-                                        }
+                                } else if (option == 4) {
+                                    if (editablePlaylist.searchAudio(audioName, producerObj) != null) {
+                                        editablePlaylist.deleteAudio(podcast, producerObj);
+                                        consumer.updatePlaylist(editablePlaylist);
+                                    } else {
+                                        msj = "Error. Podcast not found in the playlist.";
                                     }
-                                } else {
-                                    msj = "Error. Playlist not found.";
                                 }
+                            } else {
+                                msj = "Error. Playlist not found.";
                             }
                         } else {
                             msj = "Error. Podcast not found.";
@@ -413,6 +342,513 @@ public class AdminController {
             }
         } else {
             msj = "Error. Consumer or producer does not exist.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> sharePlaylist <br>
+     * Creates an id for a playlist to share it. <br>
+     * <b>pre: </b> The playlist exists and has content. <br>
+     * <b>post: </b> The system generated an id for the playlist.
+     * @param name User of the playlist.
+     * @param playlist Name of the playlist.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String sharePlaylist(String name, String playlist) {
+        String msj = null;
+        if (searchUser(name) != null) {
+            if (searchUser(name) instanceof Consumer) {
+                Consumer userObj = (Consumer) searchUser(name);
+                if (userObj instanceof Standard) {
+                    Standard user = (Standard) userObj;
+                    if (user.searchPlaylist(playlist) != null) {
+                        msj = user.searchPlaylist(playlist).sharePlaylist();
+                    } else {
+                        msj = "Error. Playlist not found.";
+                    }
+                } else {
+                    Premium user = (Premium) userObj;
+                    if (user.searchPlaylist(playlist) != null) {
+                        msj = user.searchPlaylist(playlist).sharePlaylist();
+                    } else {
+                        msj = "Error. Playlist not found.";
+                    }
+                }
+            } else {
+                msj = "Error. This user is not a consumer.";
+            }
+        } else {
+            msj = "Error. This user does not exist.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> simulateAudio <br>
+     * Simulates the playback of an audio. <br>
+     * <b>pre: </b> Audio, producer and consumer exist. <br>
+     * <b>post: </b> The system simulates its reproduction and updates its statistics.
+     * @param nickname Consumer.
+     * @param audio Name of the audio.
+     * @param type 1 or 2 to play a song or podcast respectively.
+     * @param producer Nickname of producer.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String simulateAudio(String nickname, String audio, int type, String producer) {
+        String msj = "Playing...";
+        if (searchUser(nickname) != null && searchUser(nickname) instanceof Consumer) {
+            Consumer objConsumer = (Consumer) searchUser(nickname);
+            if (type == 1) {
+                if (searchUser(producer) != null && searchUser(producer) instanceof Artist) {
+                    Artist objProducer = (Artist) searchUser(producer);
+                    if (objProducer.searchSong(audio) != null) {
+                        Song objAudio = (Song) objProducer.searchSong(audio);
+                        objAudio.playAudio();
+                        objConsumer.updateStats(objAudio);
+                        objProducer.updateSong(objAudio);
+                        int counter = 0;
+                        for (int i = 0; i < users.size() && counter != 2; i++) {
+                            if (users.get(i).getNickname().equalsIgnoreCase(nickname) && users.get(i) instanceof Consumer) {
+                                users.remove(i);
+                                users.add(objConsumer);
+                                counter++;
+                            }
+                            if (users.get(i).getNickname().equalsIgnoreCase(producer) && users.get(i) instanceof Artist) {
+                                users.remove(i);
+                                users.add(objProducer);
+                                counter++;
+                            }
+                        }
+                    } else {
+                        msj = "Error. Audio not found.";
+                    }
+                } else {
+                    msj = "Error. The producer does not exist or is not valid.";
+                }
+            } else if(type == 2) {
+                if (searchUser(producer) != null && searchUser(producer) instanceof ContentProducer) {
+                    ContentProducer objProducer = (ContentProducer) searchUser(producer);
+                    if (objProducer.searchPodcast(audio) != null) {
+                        Podcast objAudio = (Podcast) objProducer.searchPodcast(audio);
+                        objAudio.playAudio();
+                        objConsumer.updateStats(objAudio);
+                        objProducer.updatePodcast(objAudio);
+                        int counter = 0;
+                        for (int i = 0; i < users.size() && counter != 2; i++) {
+                            if (users.get(i).getNickname().equalsIgnoreCase(nickname) && users.get(i) instanceof Consumer) {
+                                users.remove(i);
+                                users.add(objConsumer);
+                                counter++;
+                            }
+                            if (users.get(i).getNickname().equalsIgnoreCase(producer) && users.get(i) instanceof ContentProducer) {
+                                users.remove(i);
+                                users.add(objProducer);
+                                counter++;
+                            }
+                        }
+                    } else {
+                        msj = "Error. Audio not found.";
+                    }
+                } else {
+                    msj = "Error. The producer does not exist or is not valid.";
+                }
+            } else {
+                msj = "Error. Invalid type of audio.";
+            }
+        } else {
+            msj = "Error. User not found.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> buySong <br>
+     * Buy a song for a certain consumer. <br>
+     * <b>pre: </b> Song, artist and consumer exist. <br>
+     * <b>post: </b> The system generates the purchase of the song and updates its statistics.
+     * @param consumer Nickname of consumer.
+     * @param song Name of the song.
+     * @param artist Nickname of the artist.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String buySong(String consumer, String song, String artist) {
+        String msj;
+        if (searchUser(consumer) != null && searchUser(consumer) instanceof Consumer) {
+            Consumer objConsumer = (Consumer) searchUser(consumer);
+            if (searchUser(artist) != null && searchUser(artist) instanceof Artist) {
+                Artist objArtist = (Artist) searchUser(artist);
+                if (objArtist.searchSong(song) != null) {
+                    Song objSong = objArtist.searchSong(song);
+                    msj = objConsumer.buySong(objSong);
+                    if (msj.equalsIgnoreCase("Succesfully purchased.")) {
+                        objSong.sell();
+                        objArtist.updateSong(objSong);
+                        boolean found = false;
+                        for (int i = 0; i < users.size() && !found; i++) {
+                            if (users.get(i).getNickname().equalsIgnoreCase(artist) && users.get(i) instanceof Artist) {
+                                users.remove(i);
+                                users.add(objArtist);
+                            }
+                        }
+                    }
+                } else {
+                    msj = "Error. Song not found.";
+                }
+            } else {
+                msj = "Error. Artist not found.";
+            }
+        } else {
+            msj = "Error. User not found.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> reportAudioViews <br>
+     * Generates a report of the reproductions by type of audio on the entire platform. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> The system generates the report.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String reportAudioViews() {
+        String msj = null;
+        int repSongs = 0;
+        int repPodcasts = 0;
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Producer) {
+                Producer objProducer = (Producer) users.get(i);
+                if (users.get(i) instanceof Artist) {
+                    repSongs += objProducer.getTotalRep();
+                } else if(users.get(i) instanceof ContentProducer) {
+                    repPodcasts += objProducer.getTotalRep();
+                }
+            }
+            msj = "\nSongs reproductions: " + repSongs + "\nPodcast reproductions: " + repPodcasts;
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> reportBestGenre <br>
+     * Generates a report of the most listened to song genre for a user and for the entire platform. <br>
+     * <b>pre: </b> The user must exist. <br>
+     * <b>post: </b> The system generates the report.
+     * @param user User to analyze.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String reportBestGenre(String user) {
+        String msj = null;
+        int counter = 0;
+        int[] genres = {0, 0, 0, 0};
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Consumer) {
+                Consumer objConsumer = (Consumer) users.get(i);
+                if (objConsumer.getSongMostListenedGenre() != null && objConsumer.getSongMostListenedGenre().equalsIgnoreCase("Rock")) {
+                    genres[0] += objConsumer.getViewsGenre("Rock");
+                } else if (objConsumer.getSongMostListenedGenre() != null && objConsumer.getSongMostListenedGenre().equalsIgnoreCase("Pop")) {
+                    genres[1] += objConsumer.getViewsGenre("Pop");
+                } else if (objConsumer.getSongMostListenedGenre() != null && objConsumer.getSongMostListenedGenre().equalsIgnoreCase("Trap")) {
+                    genres[2] += objConsumer.getViewsGenre("Trap");
+                } else if (objConsumer.getSongMostListenedGenre() != null && objConsumer.getSongMostListenedGenre().equalsIgnoreCase("House")) {
+                    genres[3] += objConsumer.getViewsGenre("House");
+                }
+            }
+        }
+        for (int i = 0; i < genres.length; i++) {
+            if (genres[i] > counter) {
+                counter = genres[i];
+                switch (i) {
+                    case 0:
+                        msj = "Most listened genre: Rock (" + genres[i] + " views).";
+                        break;
+                    case 1:
+                        msj = "Most listened genre: Pop (" + genres[i] + " views).";
+                        break;
+                    case 2:
+                        msj = "Most listened genre: Trap (" + genres[i] + " views).";
+                        break;
+                    case 3:
+                        msj = "Most listened genre: House (" + genres[i] + " views).";
+                        break;
+                }
+            } else if (counter == 0) {
+                msj = "No one has heard any song yet.";
+            }
+        }
+        if (searchUser(user) != null && searchUser(user) instanceof Consumer) {
+            Consumer objConsumer = (Consumer) searchUser(user);
+            if (objConsumer.getSongMostListenedGenre() != null) {
+                msj += "\nUser's most listened genre: " + objConsumer.getSongMostListenedGenre() + " (" + objConsumer.getViewsGenre(objConsumer.getSongMostListenedGenre()) + " views).";
+            } else {
+                msj += "\nThis user has not listened to any song yet.";
+            }
+        } else {
+            msj += "\nUser not found.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> reportBestCategory <br>
+     * Generates a report of the most listened to podcast category for a user and for the entire platform. <br>
+     * <b>pre: </b> The user must exist. <br>
+     * <b>post: </b> The system generates the report.
+     * @param user User to analyze.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String reportBestCategory(String user) {
+        int counter = 0;
+        String msj = null;
+        int[] categories = {0, 0, 0, 0};
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Consumer) {
+                Consumer objConsumer = (Consumer) users.get(i);
+                if (objConsumer.getPodcastMostListenedCategory() != null && objConsumer.getPodcastMostListenedCategory().equalsIgnoreCase("Politic")) {
+                    categories[0] += objConsumer.getViewsCategory("Politic");
+                } else if (objConsumer.getPodcastMostListenedCategory() != null && objConsumer.getPodcastMostListenedCategory().equalsIgnoreCase("Entertainment")) {
+                    categories[1] += objConsumer.getViewsCategory("Entertainment");
+                } else if (objConsumer.getPodcastMostListenedCategory() != null && objConsumer.getPodcastMostListenedCategory().equalsIgnoreCase("Game")) {
+                    categories[2] += objConsumer.getViewsCategory("Game");
+                } else if (objConsumer.getPodcastMostListenedCategory() != null && objConsumer.getPodcastMostListenedCategory().equalsIgnoreCase("Fashion")) {
+                    categories[3] += objConsumer.getViewsCategory("Fashion");
+                }
+            }
+        }
+        for (int i = 0; i < categories.length; i++) {
+            if (categories[i] > counter) {
+                counter = categories[i];
+                switch (i) {
+                    case 0:
+                        msj = "Most listened category: Politic (" + categories[i] + " views).";
+                        break;
+                    case 1:
+                        msj = "Most listened category: Entertainment (" + categories[i] + " views).";
+                        break;
+                    case 2:
+                        msj = "Most listened category: Game (" + categories[i] + " views).";
+                        break;
+                    case 3:
+                        msj = "Most listened category: Fashion (" + categories[i] + " views).";
+                        break;
+                }
+            } else if (counter == 0) {
+                msj = "No one has heard any podcast yet.";
+            }
+        }
+        if (searchUser(user) != null && searchUser(user) instanceof Consumer) {
+            Consumer objConsumer = (Consumer) searchUser(user);
+            if (objConsumer.getPodcastMostListenedCategory() != null) {
+                msj += "\nUser's most listened category: " + objConsumer.getPodcastMostListenedCategory() + " (" + objConsumer.getViewsCategory(objConsumer.getPodcastMostListenedCategory()) + " views).";
+            } else {
+                msj += "\nThis user has not listened to any podcast yet.";
+            }
+        } else {
+            msj += "\nUser not found.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> reportTopProducers <br>
+     * Generates a report of the top 5 most listened to producers on the platform. <br>
+     * <b>pre: </b> Does not apply <br>
+     * <b>post: </b> The system generates the report.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String reportTopProducers() {
+        String msj = "\n-Top 5 Artists-";
+        ArrayList<Artist> artists = new ArrayList<Artist>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Artist) {
+                Artist objArtist = (Artist) users.get(i);
+                artists.add(objArtist);
+            }
+        }
+        if (artists.size() != 0) {
+            Collections.sort(artists, Collections.reverseOrder());
+            for (int i = 0; i < artists.size() && i < 5; i++) {
+                msj += "\n" + (i+1) + ". " + artists.get(i).getNickname() + ": " + artists.get(i).getTotalRep() + " views.";
+            }
+        } else {
+            msj = "\nNo artists registered.";
+        }
+        ArrayList<ContentProducer> producers = new ArrayList<ContentProducer>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof ContentProducer) {
+                ContentProducer objProducer = (ContentProducer) users.get(i);
+                producers.add(objProducer);
+            }
+        }
+        if (producers.size() != 0) {
+            msj += "\n\n-Top 5 Content Producers-";
+            Collections.sort(producers, Collections.reverseOrder());
+            for (int i = 0; i < producers.size() && i < 5; i++) {
+                msj += "\n" + (i+1) + ". " + producers.get(i).getNickname() + ": " + producers.get(i).getTotalRep() + " views.";
+            }
+        } else {
+            msj += "\n\nNo content producers registered.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> reportTopAudios <br>
+     * Generates a report of the top 5 most listened to audios on the entire platform. <br>
+     * <b>pre: </b> Does not apply <br>
+     * <b>post: </b> The system generates the report.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String reportTopAudios() {
+        String msj = "\n-Top 10 Songs-";
+        ArrayList<Song> songs = new ArrayList<Song>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Artist) {
+                Artist objArtist = (Artist) users.get(i);
+                for (int j = 0; j < objArtist.getSongs().size(); j++) {
+                    songs.add(objArtist.getSongs().get(j));
+                }
+            }
+        }
+        if (songs.size() != 0) {
+            Collections.sort(songs, Collections.reverseOrder());
+            for (int i = 0; i < songs.size() && i < 10; i++) {
+                switch (songs.get(i).getGenre()) {
+                    case ROCK:
+                        msj += "\n" + (i+1) + ". " + songs.get(i).getName() + ". Genre: Rock (" + songs.get(i).getViews() + " views).";
+                        break;
+                    case POP:
+                        msj += "\n" + (i+1) + ". " + songs.get(i).getName() + ". Genre: Pop (" + songs.get(i).getViews() + " views).";
+                        break;
+                    case TRAP:
+                        msj += "\n" + (i+1) + ". " + songs.get(i).getName() + ". Genre: Trap (" + songs.get(i).getViews() + " views).";
+                        break;
+                    case HOUSE:
+                        msj += "\n" + (i+1) + ". " + songs.get(i).getName() + ". Genre: House (" + songs.get(i).getViews() + " views).";
+                        break;
+                }
+            }
+        } else {
+            msj = "\nNo songs registered.";
+        }
+        ArrayList<Podcast> podcasts = new ArrayList<Podcast>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof ContentProducer) {
+                ContentProducer objProducer = (ContentProducer) users.get(i);
+                for (int j = 0; j < objProducer.getPodcasts().size(); j++) {
+                    podcasts.add(objProducer.getPodcasts().get(j));
+                }
+            }
+        }
+        if (podcasts.size() != 0) {
+            msj += "\n\n-Top 10 Podcasts-";
+            Collections.sort(podcasts, Collections.reverseOrder());
+            for (int i = 0; i < podcasts.size() && i < 10; i++) {
+                switch (podcasts.get(i).getCategory()) {
+                    case POLITIC:
+                        msj += "\n" + (i+1) + ". " + podcasts.get(i).getName() + ". Category: Politic (" + podcasts.get(i).getViews() + " views).";
+                        break;
+                    case ENTERTAINMENT:
+                        msj += "\n" + (i+1) + ". " + podcasts.get(i).getName() + ". Category: Entertainment (" + podcasts.get(i).getViews() + " views).";
+                        break;
+                    case GAME:
+                        msj += "\n" + (i+1) + ". " + podcasts.get(i).getName() + ". Category: Game (" + podcasts.get(i).getViews() + " views).";
+                        break;
+                    case FASHION:
+                        msj += "\n" + (i+1) + ". " + podcasts.get(i).getName() + ". Category: Fashion (" + podcasts.get(i).getViews() + " views).";
+                        break;
+                }
+            }
+        } else {
+            msj += "\n\nNo podcasts registered.";
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> reportGenderSales <br>
+     * Generates a report of sales recorded by song genre. <br>
+     * <b>pre: </b> Does not apply <br>
+     * <b>post: </b> The system generates the report.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String reportGenderSales() {
+        String msj = "\n-Gender stats-";
+        int[] genres = new int[] {0, 0, 0, 0};
+        double[] sales = new double[] {0, 0, 0, 0};
+        ArrayList<Shop> songs = new ArrayList<Shop>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Standard) {
+                Standard objConsumer = (Standard) users.get(i);
+                for (int j = 0; j < objConsumer.getSongs().length; j++) {
+                    if (objConsumer.getSongs()[j] != null) {
+                        songs.add(objConsumer.getSongs()[j]);
+                    }
+                }
+            } else if(users.get(i) instanceof Premium) {
+                Premium objConsumer = (Premium) users.get(i);
+                for (int j = 0; j < objConsumer.getSongs().size(); j++) {
+                    songs.add(objConsumer.getSongs().get(j));
+                }
+            }
+        }
+        for (int i = 0; i < songs.size(); i++) {
+            switch (songs.get(i).getSong().getGenre()) {
+                case ROCK:
+                    genres[0]++;
+                    sales[0] += songs.get(i).getSong().getPrice();
+                    break;
+                case POP:
+                    genres[1]++;
+                    sales[1] += songs.get(i).getSong().getPrice();
+                    break;
+                case TRAP:
+                    genres[2]++;
+                    sales[2] += songs.get(i).getSong().getPrice();
+                    break;
+                case HOUSE:
+                    genres[3]++;
+                    sales[3] += songs.get(i).getSong().getPrice();
+                    break;
+            }
+        }
+        msj += "\nRock: " + genres[0] + " songs sold, " + sales[0] + "$ in sales.";
+        msj += "\nPop: " + genres[1] + " songs sold, " + sales[1] + "$ in sales.";
+        msj += "\nTrap: " + genres[2] + " songs sold, " + sales[2] + "$ in sales.";
+        msj += "\nHouse: " + genres[3] + " songs sold, " + sales[3] + "$ in sales.";
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> reportBestSong <br>
+     * Generates a report of the best-selling song on the platform. <br>
+     * <b>pre: </b> Does not apply <br>
+     * <b>post: </b> The system generates the report.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String reportBestSong() {
+        String msj = "\nBest selling song: ";
+        ArrayList<Shop> songs = new ArrayList<Shop>();
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i) instanceof Standard) {
+                Standard objConsumer = (Standard) users.get(i);
+                for (int j = 0; j < objConsumer.getSongs().length; j++) {
+                    if (objConsumer.getSongs()[j] != null) {
+                        songs.add(objConsumer.getSongs()[j]);
+                    }
+                }
+            } else if(users.get(i) instanceof Premium) {
+                Premium objConsumer = (Premium) users.get(i);
+                for (int j = 0; j < objConsumer.getSongs().size(); j++) {
+                    songs.add(objConsumer.getSongs().get(j));
+                }
+            }
+        }
+        if (songs.size() != 0) {
+            Collections.sort(songs, Collections.reverseOrder());
+            msj += songs.get(0).getSong().getName() + ". \nTimes sold: " + songs.get(0).getSong().getAmountSales() + ". \nTotal sales: " + (songs.get(0).getSong().getPrice() * songs.get(0).getSong().getAmountSales()) + ".";
+        } else {
+            msj = "\nNo song has been purchased.";
         }
         return msj;
     }

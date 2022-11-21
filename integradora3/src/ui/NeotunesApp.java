@@ -1,6 +1,8 @@
 package ui;
 import model.*;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
 Program objective: Create a music streaming software that allows users to register consumers and producers,
@@ -39,6 +41,8 @@ public class NeotunesApp {
         NeotunesApp objMain = new NeotunesApp();
         System.out.println("Welcome to Neotunes!");
         int option = 0;
+        
+        objMain.tests();
 
         do {
             objMain.displayMenu();
@@ -57,6 +61,18 @@ public class NeotunesApp {
                 case 4:
                     objMain.editPlaylist();
                     break;
+                case 5:
+                    objMain.sharePlaylist();
+                    break;
+                case 6:
+                    objMain.simulateAudio();
+                    break;
+                case 7:
+                    objMain.buySong();
+                    break;
+                case 8:
+                    objMain.generateReport();
+                    break;
                 case 0:
                     System.out.println("\nExit done.");
                     break;
@@ -65,6 +81,19 @@ public class NeotunesApp {
                     break;
             }
         } while (option != 0);
+    }
+
+    /**
+     * <b>name: </b> tests <br>
+     * Initializes the program with some preset registers. <br>
+     */
+    public void tests() {
+        controller.addUser(1, "Juan", "1126597295");
+        controller.addUser(1, "Peter", "Bruno Mars", "google.com", "125611651");
+        controller.addUser(1, "Carolina", "Karol G", "youtube.com", "1056156165");
+        controller.addUser(2, "Paco", "Bizarrap", "a", "1");
+        controller.addAudio("Provenza", "google.com", "Provenza", 20, 1, "Karol G", 50);
+        controller.addAudio("Universo", "google.com", "El fin del mundo", 1, "Bizarrap", 3500);
     }
     
     /**
@@ -77,6 +106,10 @@ public class NeotunesApp {
         "\n2. Register audio" +
         "\n3. Register playlist" +
         "\n4. Edit playlist" +
+        "\n5. Share playlist" +
+        "\n6. Simulate audio" +
+        "\n7. Buy song" +
+        "\n8. Generate report" +
         "\n0. Exit" +
         "\nOption: ");
     }
@@ -222,5 +255,123 @@ public class NeotunesApp {
         System.out.print("Enter consumer (nickname): ");
         String consumer = input.nextLine();
         System.out.println(controller.editPlaylist(playlist, audio, consumer, producer, option));
+    }
+
+    /**
+     * <b>name: </b> sharePlaylist <br>
+     * This function creates an id of a playlist so that it can be shared between users. <br>
+     */
+    public void sharePlaylist() {
+        System.out.print("\nEnter name of consumer: ");
+        String name = input.nextLine();
+        System.out.print("Enter playlist to share: ");
+        String playlist = input.nextLine();
+        System.out.println(controller.sharePlaylist(name, playlist));
+    }
+
+    /**
+     * <b>name: </b> simulateAudio <br>
+     * This function simulates the playback of an audio. <br>
+     */
+    public void simulateAudio() {
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            int counter = 0;
+            public void run() {
+                System.out.print(".");
+                counter++;
+                if (counter == 3) {
+                    cancel();
+                }
+            }
+        };
+        System.out.print("\nEnter consumer (nickname): ");
+        String nickname = input.nextLine();
+        System.out.print("Enter name of audio: ");
+        String audio = input.nextLine();
+        System.out.print("\nEnter a type of audio: " +
+        "\n1. Song" +
+        "\n2. Podcast" +
+        "\nOption: ");
+        int type = input.nextInt();
+        input.nextLine();
+        System.out.print("\nEnter name of producer: ");
+        String producer = input.nextLine();
+        String msj = controller.simulateAudio(nickname, audio, type, producer);
+        if (msj.equalsIgnoreCase("Playing...")) {
+            System.out.println("Playing " + audio + " from " + producer + "...");
+            timer.schedule(task, 1000, 1000);
+            try {
+                Thread.sleep(4000);
+            } catch (Exception x) {
+                System.out.println(x);
+            }
+            System.out.println("\nReproduction done.");
+        } else {
+            System.out.println(msj);
+        }
+    }
+
+    /**
+     * <b>name: </b> buySong <br>
+     * This feature allows the consumer user to purchase a song. <br>
+     */
+    public void buySong() {
+        System.out.print("\nEnter consumer (nickname): ");
+        String consumer = input.nextLine();
+        System.out.print("Enter song name: ");
+        String song = input.nextLine();
+        System.out.print("Enter artist: ");
+        String artist = input.nextLine();
+        System.out.println(controller.buySong(consumer, song, artist));
+    }
+
+    /**
+     * <b>name: </b> generateReport <br>
+     * This function generates reports as requested. <br>
+     */
+    public void generateReport() {
+        System.out.print("\nSelect report: " +
+        "\n1. Report plays by audio type" +
+        "\n2. Report genre of most listened song" +
+        "\n3. Report most listened to podcast category" +
+        "\n4. Report top 5 producers by type" +
+        "\n5. Report top 10 audios by type" +
+        "\n6. Report sales by song genre" +
+        "\n7. Report top selling song" +
+        "\nOption: ");
+        int option = input.nextInt();
+        String name = null;
+        input.nextLine();
+        switch (option) {
+            case 1:
+                System.out.println(controller.reportAudioViews());
+                break;
+            case 2:
+                System.out.print("\nEnter consumer (nickname): ");
+                name = input.nextLine();
+                System.out.println(controller.reportBestGenre(name));
+                break;
+            case 3:
+                System.out.print("\nEnter consumer (nickname): ");
+                name = input.nextLine();
+                System.out.println(controller.reportBestCategory(name));
+                break;
+            case 4:
+                System.out.println(controller.reportTopProducers());
+                break;
+            case 5:
+                System.out.println(controller.reportTopAudios());
+                break;
+            case 6:
+                System.out.println(controller.reportGenderSales());
+                break;
+            case 7:
+                System.out.println(controller.reportBestSong());
+                break;
+            default:
+                System.out.println("Error. Invalid option.");
+                break;
+        }
     }
 }

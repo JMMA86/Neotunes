@@ -1,5 +1,23 @@
 package model;
 
+/**
+ * <b>Enumeration: </b> Category <br>
+ */
 public enum Category {
-    POLITIC, ENTERTAINMENT, GAME, FASHION;
+    /**
+     * Politic category
+     */
+    POLITIC,
+    /**
+     * Entertainment category
+     */
+    ENTERTAINMENT,
+    /**
+     * Game category
+     */
+    GAME,
+    /**
+     * Fashion category
+     */
+    FASHION;
 }

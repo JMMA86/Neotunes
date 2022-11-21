@@ -1,6 +1,5 @@
 package model;
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 /**
  * <b>Class: </b> Standard <br>
@@ -37,7 +36,7 @@ public class Standard extends Consumer {
      * @return <b>playlist</b>. Contains the playlist if it is found.
      */
     public Playlist searchPlaylist(String name) {
-        Playlist playlist = null;
+        Playlist playlist = super.searchPlaylist(name);
         boolean found = false;
         for (int i = 0; i < LIMIT_PLAYLISTS && !found; i++) {
             if (playlists[i] != null && playlists[i].getName().equalsIgnoreCase(name)) {
@@ -51,13 +50,13 @@ public class Standard extends Consumer {
     /**
      * <b>name: </b> addPlaylist <br>
      * Adds a playlist to a Standard consumer. <br>
-     * <b>pre: </b> The creation of the playlst doesn't exceed the limit (20 playlists), and its name has not been previously registered. <br>
+     * <b>pre: </b> The creation of the playlist doesn't exceed the limit (20 playlists), and its name has not been previously registered. <br>
      * <b>post: </b> Adds the playlist if it's possible.
      * @param name Name of the playlist to be added.
      * @return <b>msj</b>. Contains the result of the operation.
      */
     public String addPlaylist(String name) {
-        String msj = "Limit reached.";
+        String msj = super.addPlaylist(name);
         Playlist playlist = new Playlist(name);
         boolean isAvailable = false;
         if (searchPlaylist(name) == null) {
@@ -66,6 +65,8 @@ public class Standard extends Consumer {
                     playlists[i] = playlist;
                     isAvailable = true;
                     msj = "Added.";
+                } else {
+                    msj = "Limit reached.";
                 }
             }
         } else {
@@ -82,6 +83,7 @@ public class Standard extends Consumer {
      * @param playlist Playlist to be updated.
      */
     public void updatePlaylist(Playlist playlist) {
+        super.updatePlaylist(playlist);
         boolean found = false;
         for (int i = 0; i < LIMIT_PLAYLISTS && !found; i++) {
             if (playlist.getName().equalsIgnoreCase(playlists[i].getName())) {
@@ -89,5 +91,49 @@ public class Standard extends Consumer {
                 found = true;
             }
         }
+    }
+
+    /**
+     * <b>name: </b> buySong <br>
+     * Purchase a song for a user. <br>
+     * <b>pre: </b> The song must exist. Purchase must not exceed 100 songs. <br>
+     * <b>post: </b> The purchase is made.
+     * @param song Song to buy.
+     * @return <b>msj</b>. Contains the result of the operation.
+     */
+    public String buySong(Song song) {
+        String msj = super.buySong(song);
+        boolean done = false;
+        boolean found = false;
+        for (int i = 0; i < songs.length && !found; i++) {
+            if (songs[i] != null && songs[i].getSong() == song) {
+                msj = "Error. Song already bought.";
+                found = true;
+            }
+        }
+        if (!found) {
+            if (songs[songs.length - 1] == null) {
+                for (int i = 0; i < songs.length && !done; i++) {
+                    if (songs[i] == null) {
+                        songs[i] = new Shop(song);
+                        done = true;
+                    }
+                }
+            } else {
+                msj = "Error. Limit reached for this user.";
+            }
+        }
+        return msj;
+    }
+
+    /**
+     * <b>name: </b> getSongs <br>
+     * Returns the list of songs purchased by the user. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the list.
+     * @return <b>songs</b> List of songs.
+     */
+    public Shop[] getSongs() {
+        return songs;
     }
 }

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 /**
  * <b>Class: </b> Shop <br>
  */
-public class Shop {
+public class Shop implements Comparable<Shop> {
     //constants
 
     //attributes
@@ -22,5 +22,21 @@ public class Shop {
     public Shop(Song song) {
         this.purchaseDate = LocalDate.now();
         this.song = song;
+    }
+
+    /**
+     * <b>name: </b> getSong <br>
+     * Returns the purchased song. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the song.
+     * @return <b>song</b> Purchased song.
+     */
+    public Song getSong() {
+        return song;
+    }
+
+    @Override
+    public int compareTo(Shop o) {
+        return song.getAmountSales().compareTo(o.getSong().getAmountSales());
     }
 }

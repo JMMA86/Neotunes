@@ -3,7 +3,7 @@ package model;
 /**
  * <b>Class: </b> Podcast <br>
  */
-public class Podcast extends Audio implements Playable{
+public class Podcast extends Audio implements Playable, Comparable<Podcast>{
     //constants
 
     //attributes
@@ -39,6 +39,38 @@ public class Podcast extends Audio implements Playable{
                 this.category = Category.FASHION;
                 break;
         }  
+    }
+
+    /**
+     * <b>name: </b> getViews <br>
+     * Returns views of the podcast. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the views.
+     * @return <b>views</b> Views of the podcast.
+     */
+    public int getViews() {
+        return views;
+    }
+
+    /**
+     * <b>name: </b> getCategory <br>
+     * Returns the category of the podcast. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the category.
+     * @return <b>category</b> category of the podcast.
+     */
+    public Category getCategory() {
+        return category;
+    }
+
+    @Override
+    public void playAudio() {
+        views++;
+    }
+
+    @Override
+    public int compareTo(Podcast o) {
+        return views.compareTo(o.getViews());
     }
     
 }

@@ -3,13 +3,16 @@ package model;
 /**
  * <b>Class: </b> Song <br>
  */
-public class Song extends Audio implements Playable, Salable {
+public class Song extends Audio implements Playable, Salable, Comparable<Song> {
     //constants
 
     //attributes
     private String album;
     private double price;
-    private int amountSales;
+    /**
+     * Sales of the song
+     */
+    protected Integer amountSales;
 
     //relations
     private Genre genre;
@@ -29,6 +32,7 @@ public class Song extends Audio implements Playable, Salable {
         super(name, urlImage, timeRep);
         this.album = album;
         this.price = price;
+        this.amountSales = 0;
         switch (genre) {
             case 1:
                 this.genre = Genre.ROCK;
@@ -43,5 +47,64 @@ public class Song extends Audio implements Playable, Salable {
                 this.genre = Genre.HOUSE;
                 break;
         }    
+    }
+
+    /**
+     * <b>name: </b> getGenre <br>
+     * Returns the genre of the song. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the genre.
+     * @return <b>genre</b> genre of the song.
+     */
+    public Genre getGenre() {
+        return genre;
+    }
+
+    /**
+     * <b>name: </b> getViews <br>
+     * Returns views of the song. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the views.
+     * @return <b>views</b> Views of the song.
+     */
+    public int getViews() {
+        return views;
+    }
+
+    /**
+     * <b>name: </b> getPrice <br>
+     * Returns price of the song. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the price.
+     * @return <b>price</b> Price of the song.
+     */
+    public double getPrice() {
+        return price;
+    }
+
+    /**
+     * <b>name: </b> getAmountSales <br>
+     * Returns sales of the song. <br>
+     * <b>pre: </b> Does not apply. <br>
+     * <b>post: </b> Returns the sales.
+     * @return <b>amountSales</b> Sales of the song.
+     */
+    public Integer getAmountSales() {
+        return amountSales;
+    }
+
+    @Override
+    public void playAudio() {
+        views++;
+    }
+
+    @Override
+    public void sell() {
+        amountSales++;
+    }
+
+    @Override
+    public int compareTo(Song o) {
+        return views.compareTo(o.getViews());
     }
 }

@@ -1,5 +1,23 @@
 package model;
 
+/**
+ * <b>Enumeration: </b> Genre <br>
+ */
 public enum Genre {
-    ROCK, POP, TRAP, HOUSE;
+    /**
+     * Rock genre
+     */
+    ROCK,
+    /**
+     * Pop genre
+     */
+    POP,
+    /**
+     * Trap genre
+     */
+    TRAP,
+    /**
+     * House genre
+     */
+    HOUSE;
 }
